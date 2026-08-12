@@ -1,0 +1,281 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------------
+   Atelier design tokens
+
+   Light is the default. Dark is authored separately below rather than being a
+   mechanical inversion — the paper warms up, the accent lifts, and the rules
+   soften so the artwork keeps its weight.
+   --------------------------------------------------------------------------- */
+
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+:root {
+  --bg: #fbfaf8;
+  --surface: #f2f0eb;
+  --fg: #1a1915;
+  --muted: #6b675d;
+  --line: #e1ddd4;
+  --line-strong: #c9c3b7;
+  --accent: #9c4a24;
+  --accent-contrast: #fbfaf8;
+
+  --art-bg: #eceae3;
+  --art-ink: #1a1915;
+  --art-accent: #9c4a24;
+
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  --bg: #0d0d0b;
+  --surface: #161613;
+  --fg: #eeebe4;
+  --muted: #948f84;
+  --line: #262521;
+  --line-strong: #3b3933;
+  --accent: #d8815a;
+  --accent-contrast: #14130f;
+
+  --art-bg: #141412;
+  --art-ink: #eeebe4;
+  --art-accent: #d8815a;
+
+  color-scheme: dark;
+}
+
+/* Honour the OS preference before JavaScript runs and when it never does. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d0d0b;
+    --surface: #161613;
+    --fg: #eeebe4;
+    --muted: #948f84;
+    --line: #262521;
+    --line-strong: #3b3933;
+    --accent: #d8815a;
+    --accent-contrast: #14130f;
+
+    --art-bg: #141412;
+    --art-ink: #eeebe4;
+    --art-accent: #d8815a;
+
+    color-scheme: dark;
+  }
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-accent: var(--accent);
+  --color-accent-contrast: var(--accent-contrast);
+
+  --text-display: clamp(2.75rem, 8vw, 6.5rem);
+  --text-display--line-height: 0.94;
+  --text-display--letter-spacing: -0.025em;
+
+  --text-title: clamp(2rem, 4.6vw, 3.75rem);
+  --text-title--line-height: 1.02;
+  --text-title--letter-spacing: -0.02em;
+
+  --text-heading: clamp(1.5rem, 2.6vw, 2.125rem);
+  --text-heading--line-height: 1.12;
+  --text-heading--letter-spacing: -0.015em;
+
+  --text-lead: clamp(1.0625rem, 1.5vw, 1.3125rem);
+  --text-lead--line-height: 1.55;
+
+  --text-eyebrow: 0.6875rem;
+  --text-eyebrow--line-height: 1;
+  --text-eyebrow--letter-spacing: 0.16em;
+}
+
+/* Fonts are declared in a non-inline @theme so that --font-display and
+   --font-sans exist as real custom properties usable outside utility classes.
+   --font-serif-src / --font-sans-src are injected onto <html> by next/font. */
+@theme {
+  --font-display: var(--font-serif-src), Georgia, "Times New Roman", serif;
+  --font-sans: var(--font-sans-src), ui-sans-serif, system-ui, -apple-system, sans-serif;
+}
+
+@layer base {
+  * {
+    border-color: var(--line);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-sans);
+    font-synthesis-weight: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    /* Guards against any single wide child forcing a horizontal scrollbar. */
+    overflow-x: clip;
+  }
+
+  ::selection {
+    background-color: var(--accent);
+    color: var(--accent-contrast);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 1px;
+  }
+
+  /* Fallback for browsers without :focus-visible support. */
+  a:focus,
+  button:focus,
+  input:focus,
+  select:focus,
+  textarea:focus {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+
+  a:focus:not(:focus-visible),
+  button:focus:not(:focus-visible),
+  input:focus:not(:focus-visible),
+  select:focus:not(:focus-visible),
+  textarea:focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+}
+
+@layer components {
+  .eyebrow {
+    font-family: var(--font-sans);
+    font-size: var(--text-eyebrow);
+    letter-spacing: var(--text-eyebrow--letter-spacing);
+    line-height: 1;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* Understated editorial underline that draws in on hover. */
+  .link-rule {
+    background-image: linear-gradient(currentColor, currentColor);
+    background-size: 0% 1px;
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    transition: background-size 400ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .link-rule:hover,
+  .link-rule:focus-visible {
+    background-size: 100% 1px;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Motion
+
+   Scroll-linked reveals use `animation-timeline: view()`, so they need no
+   JavaScript and degrade to "always visible" in browsers without support.
+   Everything is gated behind prefers-reduced-motion.
+   --------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    /* Settles well before the element is fully in view, so nothing that has
+       arrived on screen is ever left dimmed. */
+    .reveal {
+      animation: reveal-in linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 65%;
+    }
+  }
+
+  .rise {
+    animation: reveal-in 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .rise-1 {
+    animation-delay: 90ms;
+  }
+
+  .rise-2 {
+    animation-delay: 180ms;
+  }
+
+  .rise-3 {
+    animation-delay: 270ms;
+  }
+}
+
+@keyframes reveal-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Nothing may be mid-animation on paper. */
+@media print {
+  .reveal,
+  .rise {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* Theme toggle labels/icons are swapped in CSS so the button is correct before
+   hydration and never mismatches on the server. */
+[data-theme="dark"] .theme-when-light,
+:root:not([data-theme="dark"]) .theme-when-dark {
+  display: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]):not([data-theme="dark"]) .theme-when-light {
+    display: none;
+  }
+
+  :root:not([data-theme="light"]):not([data-theme="dark"]) .theme-when-dark {
+    display: inline;
+  }
+}
